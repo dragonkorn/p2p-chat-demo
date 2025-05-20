@@ -1,11 +1,11 @@
 {
   "name": "p2p-chat-demo",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node peer.js"
+    "start": "node src/index.js"
   },
   "dependencies": {
     "@chainsafe/libp2p-noise": "^16.1.3",
