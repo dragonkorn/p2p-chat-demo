@@ -8,8 +8,8 @@ This is a simple peer-to-peer (P2P) network demo using [libp2p](https://libp2p.i
 
 - **libp2p**: Core peer-to-peer networking framework
 - **@libp2p/tcp**: TCP transport layer
-- **@libp2p/mplex**: Stream multiplexer
-- **@libp2p/noise**: Secure communication via Noise protocol
+- **@chainsafe/libp2p-yamux**: Stream multiplexer (Yet another Multiplexer)
+- **@chainsafe/libp2p-noise**: Secure communication via Noise protocol
 
 ---
 
@@ -40,23 +40,52 @@ yarn install
 In one terminal:
 
 ```bash
-yarn run peer.js
+yarn start
 ```
 
 In another terminal:
 
 ```bash
-yarn run peer.js
+yarn start
+```
+
+### 5. Using the Interactive CLI
+
+After starting the peer service, you can use the following commands in the interactive CLI:
+
+#### List all discovered peers
+
+```bash
+list
+```
+
+#### Send a message to a specific peer
+
+```bash
+send <peerId> <message>
+```
+
+Example:
+
+```bash
+send eer123 Hello from peer!
+```
+
+#### Exit the program
+
+```bash
+exit
 ```
 
 Each peer will start with a unique peer ID and can be extended to send messages or discover other peers.
 
 ## 🧱 Project Structure
 
-| File         | Description                                                       |
-| ------------ | ----------------------------------------------------------------- |
-| peer.js      | Creates and starts a basic libp2p peer with TCP, mplex, and noise |
-| package.json | Project metadata and dependencies                                 |
+| File          | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| index.js      | Creates and starts a basic libp2p peer with TCP, mplex, and noise |
+| connection.js | Creates a handler function for discover other peer                |
+| package.json  | Project metadata and dependencies                                 |
 
 ## 💡 Learn More
 
