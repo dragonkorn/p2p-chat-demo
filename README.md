@@ -93,3 +93,14 @@ Each peer will start with a unique peer ID and can be extended to send messages 
 - libp2p examples
 - Noise protocol
 - Multiplexing (mplex)
+
+## Peer Workflow
+
+[![](https://mermaid.ink/img/pako:eNp9kk1PwzAMhv9K5BNIpfSDtV0OSBuIGwixG-olJGaLaJOSuIgx7b-TbnTaoeJmO4_f15azA2kVAgePnz0aifdarJ1oa8NYJxxpqTthiD0jOraYrC5rM9SPxNXt7THgbEWBZI1-67KOmeByopYjtfyPWpxR7f3Tiintpf1C5wfLCcMH7dCzLmR8RLeTaoNNrLRoLi4Z2TO15ZnaQkrsyDNpjUFJ2h62fLKEbFD-U43YKHp34hh6Em-N9htUk_6D9bOzZKVtLmq4lhtB12mcxEkNl5PDvKDvrFF-GNeTQ9FCBC26VmgVjrcbmmqgDbZYAw-hEu6jhtrsAyd6squtkcDJ9RhB3ylB46HHIipN1j0eP8PhT0QQbvxq7QkJKfAdfAPPi1lcVWlWlmU2T_Iqi2ALfJbE1bxIyzyvbvJ0Vt7sI_g59IeHvKiKLCuKpMiLeRIanO3XG-DvovFBe-2GRY4-Do1Cd2d7Q8DTstr_AsmV16Q?type=png)](https://mermaid.live/edit#pako:eNp9kk1PwzAMhv9K5BNIpfSDtV0OSBuIGwixG-olJGaLaJOSuIgx7b-TbnTaoeJmO4_f15azA2kVAgePnz0aifdarJ1oa8NYJxxpqTthiD0jOraYrC5rM9SPxNXt7THgbEWBZI1-67KOmeByopYjtfyPWpxR7f3Tiintpf1C5wfLCcMH7dCzLmR8RLeTaoNNrLRoLi4Z2TO15ZnaQkrsyDNpjUFJ2h62fLKEbFD-U43YKHp34hh6Em-N9htUk_6D9bOzZKVtLmq4lhtB12mcxEkNl5PDvKDvrFF-GNeTQ9FCBC26VmgVjrcbmmqgDbZYAw-hEu6jhtrsAyd6squtkcDJ9RhB3ylB46HHIipN1j0eP8PhT0QQbvxq7QkJKfAdfAPPi1lcVWlWlmU2T_Iqi2ALfJbE1bxIyzyvbvJ0Vt7sI_g59IeHvKiKLCuKpMiLeRIanO3XG-DvovFBe-2GRY4-Do1Cd2d7Q8DTstr_AsmV16Q)
+
+### Don't auto-connect to all peer you discovered.
+
+- Check discovered peer is trusted or known.
+  - Make Peer ID Persistent and list in knowPeers
+  - Use an External Identifier (DID, username, etc.)
+- Connect to close peer (Using PING)

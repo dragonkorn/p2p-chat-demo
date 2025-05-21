@@ -1,15 +1,17 @@
 import { pipe } from 'it-pipe'
 import { Peer } from '../entities/peer.js'
 import Readline from 'readline';
+import { Libp2p } from 'libp2p';
+import { PeerInfo, Stream, Connection } from '@libp2p/interface';
 
 let peerConnections = new Map()
 
-export const handleChatProtocol = (node) => {
-  node.handle('/chat/1.0.0', async ({ stream, connection }) => {
+export const handleChatProtocol = (node: Libp2p) => {
+  node.handle('/chat/1.0.0', async ({ stream, connection }: { stream: Stream, connection: Connection }) => {
     const remotePeerId = connection.remotePeer.toString()
     await pipe(
       stream.source,
-      async function (source) {
+      async function (source: any) {
         const decoder = new TextDecoder()
         for await (const msg of source) {
           const message = decoder.decode(msg.subarray())
@@ -20,8 +22,8 @@ export const handleChatProtocol = (node) => {
   })
 }
 
-export const setupPeerDiscovery = (node) => {
-  node.addEventListener('peer:discovery', async (evt) => {
+export const setupPeerDiscovery = (node: Libp2p) => {
+  node.addEventListener('peer:discovery', async (evt: CustomEvent<PeerInfo>) => {
     const peer = evt.detail
     if (peerConnections.has(peer.id.toString())) {
       return
@@ -31,19 +33,19 @@ export const setupPeerDiscovery = (node) => {
     peerConnections.set(peer.id.toString(), peerConnection)
   })
 
-  node.addEventListener('connection:open', (evt) => {
+  node.addEventListener('connection:open', (evt: any) => {
     const remotePeerId = evt.detail.remotePeer.toString()
     console.log(`🔗 Peer connected: ${remotePeerId}`)
   })
 
-  node.addEventListener('connection:close', (evt) => {
+  node.addEventListener('connection:close', (evt: any) => {
     const remotePeerId = evt.detail.remotePeer.toString()
     console.log(`❌ Peer disconnected: ${remotePeerId}`)
   })
 }
 
 
-export function setupInteractiveCLI(node) {
+export function setupInteractiveCLI(node: Libp2p) {
   const rl = Readline.createInterface({
     input: process.stdin,
     output: process.stdout

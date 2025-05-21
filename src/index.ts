@@ -1,6 +1,5 @@
 import process from 'node:process'
 import { createLibp2p } from 'libp2p'
-import { multiaddr } from 'multiaddr'
 import { createLibp2pConfig } from './config/libp2p.js'
 import { handleChatProtocol, setupPeerDiscovery, setupInteractiveCLI } from './services/connection.js'
 

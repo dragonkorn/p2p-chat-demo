@@ -1,6 +1,12 @@
+import { Libp2p, PeerId, PeerInfo } from '@libp2p/interface';
+import type { Multiaddr } from '@multiformats/multiaddr'
 
 export class Peer {
-  constructor(peer) {
+  public peer: PeerInfo;
+  public id: PeerId;
+  public multiaddr: Multiaddr;
+
+  constructor(peer: PeerInfo) {
     this.peer = peer;
     this.id = peer.id;
     this.multiaddr = peer.multiaddrs[0];
@@ -11,12 +17,12 @@ export class Peer {
     return this.id.toString();
   }
 
-  async dialChat(node) {
+  async dialChat(node: Libp2p) {
     const stream = await node.dialProtocol(this.multiaddr, '/chat/1.0.0');
     return stream;
   }
 
-  async sendMessage(message, node) {
+  async sendMessage(message: string, node: Libp2p) {
     try {
       const stream = await this.dialChat(node);
       const encoder = new TextEncoder();
