@@ -3,8 +3,10 @@ import { Peer } from '../entities/peer.js'
 import Readline from 'readline';
 import { Libp2p } from 'libp2p';
 import { PeerInfo, Stream, Connection } from '@libp2p/interface';
+import { getHelpMessage } from '../utils/utils.js';
 
-let peerConnections = new Map()
+let peerConnections = new Map<string, Peer>()
+let discoveredPeers = new Map<string, Peer>()
 
 export const handleChatProtocol = (node: Libp2p) => {
   node.handle('/chat/1.0.0', async ({ stream, connection }: { stream: Stream, connection: Connection }) => {
@@ -25,25 +27,44 @@ export const handleChatProtocol = (node: Libp2p) => {
 export const setupPeerDiscovery = (node: Libp2p) => {
   node.addEventListener('peer:discovery', async (evt: CustomEvent<PeerInfo>) => {
     const peer = evt.detail
-    if (peerConnections.has(peer.id.toString())) {
+    const newPeer = new Peer(peer)
+    if (discoveredPeers.has(peer.id.toString())) {
+      if (newPeer.multiaddr?.toString() == discoveredPeers.get(peer.id.toString())?.multiaddr?.toString()) {
+        return
+      }
+    }
+
+    discoveredPeers.set(peer.id.toString(), newPeer)
+
+    const isConnected = await newPeer.dialChat(node)
+    if (!isConnected) {
       return
     }
 
-    const peerConnection = new Peer(peer)
-    peerConnections.set(peer.id.toString(), peerConnection)
+    peerConnections.set(peer.id.toString(), newPeer)
   })
 
   node.addEventListener('connection:open', (evt: any) => {
     const remotePeerId = evt.detail.remotePeer.toString()
     console.log(`🔗 Peer connected: ${remotePeerId}`)
+    if (peerConnections.has(remotePeerId)) {
+      return
+    }
+
+    const newPeer = discoveredPeers.get(remotePeerId)
+    if (!newPeer) {
+      return
+    }
+
+    peerConnections.set(remotePeerId, newPeer)
   })
 
   node.addEventListener('connection:close', (evt: any) => {
     const remotePeerId = evt.detail.remotePeer.toString()
     console.log(`❌ Peer disconnected: ${remotePeerId}`)
+    peerConnections.delete(remotePeerId)
   })
 }
-
 
 export function setupInteractiveCLI(node: Libp2p) {
   const rl = Readline.createInterface({
@@ -51,11 +72,7 @@ export function setupInteractiveCLI(node: Libp2p) {
     output: process.stdout
   });
 
-  console.log('\n=== P2P Chat CLI ===');
-  console.log('Available commands:');
-  console.log('1. list - List all discovered peers');
-  console.log('2. send <peerId> <message> - Send message to a peer');
-  console.log('3. exit - Exit the program\n');
+  console.log('\n', getHelpMessage(), '\n');
 
   rl.on('line', async (input) => {
     const [command, ...args] = input.trim().split(' ');
@@ -64,19 +81,18 @@ export function setupInteractiveCLI(node: Libp2p) {
       case '':
         break
       case 'help':
-        console.log('\n=== P2P Chat CLI ===');
-        console.log('Available commands:');
-        console.log('1. list - List all discovered peers');
-        console.log('2. send <peerId> <message> - Send message to a peer');
-        console.log('3. exit - Exit the program\n');
+        console.log('\n', getHelpMessage(), '\n');
         break;
       case '\n':
       case '\r':
         break
       case 'list':
-        console.log('\nDiscovered peers:');
+        console.log('\nConnected peers:');
         for (const peerId of peerConnections.keys()) {
-          console.log(`- ${peerConnections.get(peerId).getPeerId()}`);
+          const peer = peerConnections.get(peerId);
+          if (peer) {
+            console.log(`- ${peer.getPeerId()}`);
+          }
         }
         break;
 
@@ -88,7 +104,11 @@ export function setupInteractiveCLI(node: Libp2p) {
         const [targetPeerId, ...messageParts] = args;
         const message = messageParts.join(' ');
         const peer = peerConnections.get(targetPeerId);
-        await peer.sendMessage(message, node);
+        if (peer) {
+          await peer.sendMessage(message);
+        } else {
+          console.log('Peer not found');
+        }
         break;
 
       case 'exit':

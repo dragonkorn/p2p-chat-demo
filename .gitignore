@@ -9,3 +9,6 @@ yarn.lock
 
 # .env.local
 .env.local
+
+# dist
+dist
